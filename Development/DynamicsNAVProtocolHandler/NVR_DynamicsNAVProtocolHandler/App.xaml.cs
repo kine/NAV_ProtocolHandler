@@ -179,6 +179,8 @@ namespace NVR_DynamicsNAVProtocolHandler
                 var root = Directory.GetParent(currentFolder).Parent;
                 List<String> files = new List<string>();
                 TraverseTree(root.FullName, "Microsoft.Dynamics.Nav.Client.exe", files, fileVersion);
+                if (files.Count > 0)
+                    return files[0];
             }
             catch (Exception e)
             {
