@@ -67,13 +67,9 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -140,6 +136,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NAV_ROT\NAV_ROT.csproj">
+      <Project>{03eda0ac-f863-426e-be6b-bd9d5d8f5131}</Project>
+      <Name>NAV_ROT</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Win32Helper\Win32Helper.csproj">
       <Project>{fc7053fb-ce1d-41d8-a5bc-5705df3c9ad8}</Project>
       <Name>Win32Helper</Name>
