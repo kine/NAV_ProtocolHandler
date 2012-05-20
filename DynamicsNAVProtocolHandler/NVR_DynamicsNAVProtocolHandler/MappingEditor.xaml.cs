@@ -33,7 +33,8 @@ namespace NVR_DynamicsNAVProtocolHandler
         {
             // TODO: Complete member initialization
             NAVClient2URI.mappings.Add(mapping);
-            list.SelectedIndex = list.Items.Count-1;
+            //list.Items.MoveCurrentTo(mapping);
+            list.SelectedIndex = list.Items.IndexOf(mapping);
             navServerTextBox.Focus();
         }
 
