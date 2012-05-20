@@ -82,7 +82,7 @@ namespace NVR_DynamicsNAVProtocolHandler
 
         static public void LoadMapping()
         {
-            string _path = NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.MappingFile;
+            string _path = Environment.ExpandEnvironmentVariables(NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.MappingFile);
             if (File.Exists(_path))
             {
                 mappings = new ObservableCollection<Mapping>();
@@ -107,7 +107,7 @@ namespace NVR_DynamicsNAVProtocolHandler
         static public void SaveMapping()
         {
             XmlSerializer serializer = new XmlSerializer(typeof(ObservableCollection<Mapping>));
-            TextWriter writer = new StreamWriter(NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.MappingFile);
+            TextWriter writer = new StreamWriter(Environment.ExpandEnvironmentVariables(NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.MappingFile));
             serializer.Serialize(writer, mappings);
             writer.Close();
          }
