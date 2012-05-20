@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -24,6 +25,8 @@ namespace NVR_DynamicsNAVProtocolHandler
             NAVClient2URI.LoadMapping();
             //list.DataContext = NAVClient2URI.mappings;
             list.ItemsSource = NAVClient2URI.mappings;
+            list.Items.SortDescriptions.Add(new SortDescription("DbServer", ListSortDirection.Ascending));
+            list.Items.SortDescriptions.Add(new SortDescription("Db", ListSortDirection.Ascending));
         }
 
         public MappingEditor(Mapping mapping):this()
@@ -39,6 +42,17 @@ namespace NVR_DynamicsNAVProtocolHandler
             NAVClient2URI.SaveMapping();
             this.DialogResult = true;
             this.Close();
+        }
+
+        private void DeleteMappingCommand_Executed_1(object sender, ExecutedRoutedEventArgs e)
+        {
+            NAVClient2URI.mappings.Remove((Mapping)list.SelectedItem);
+        }
+
+        private void DeleteMappingCommand_CanExecute_1(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute=list.SelectedIndex >= 0;
+            e.Handled = true;
         }
     }
 }
