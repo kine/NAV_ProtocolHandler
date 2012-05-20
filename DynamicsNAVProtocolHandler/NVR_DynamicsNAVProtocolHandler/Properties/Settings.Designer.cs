@@ -46,5 +46,17 @@ namespace NVR_DynamicsNAVProtocolHandler.Properties {
                 this["ShowMessageBox"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("mapping.xml")]
+        public string MappingFile {
+            get {
+                return ((string)(this["MappingFile"]));
+            }
+            set {
+                this["MappingFile"] = value;
+            }
+        }
     }
 }

@@ -79,6 +79,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="NAVClient2URI.cs" />
+    <Compile Include="NAV_URI_Extender.cs" />
     <Compile Include="Toaster.xaml.cs">
       <DependentUpon>Toaster.xaml</DependentUpon>
     </Compile>
