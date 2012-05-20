@@ -8,5 +8,8 @@
     <Setting Name="ShowMessageBox" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="MappingFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">mapping.xml</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

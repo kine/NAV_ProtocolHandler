@@ -40,7 +40,7 @@ namespace NVR_DynamicsNAVProtocolHandler
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             this.Close();
-            Application.Current.Shutdown();
+            //Application.Current.Shutdown();
         }
     }
 }

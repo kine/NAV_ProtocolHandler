@@ -101,18 +101,6 @@ namespace NAV_ROT
 
     }
     /****************************/
-    public enum NavObjectType
-    {
-        Page = 8,
-        MenuSuite = 7,
-        XMLPort = 6,
-        Codeunit = 5,
-        Dataport = 4,
-        Form = 2,
-        Report = 3,
-        Table = 1,
-        None=0
-    }
     internal class CallBack : INSCallbackEnum
     {
         #region INSCallbackEnum Members

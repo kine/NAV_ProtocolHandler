@@ -20,6 +20,7 @@ namespace NVR_DynamicsNAVProtocolHandler
         {
             try
             {
+                NAVClient2URI.LoadMapping();
                 var args = "";
                 foreach (String a in e.Args)
                 {
@@ -38,7 +39,7 @@ namespace NVR_DynamicsNAVProtocolHandler
                     Process proc = System.Diagnostics.Process.GetProcessById((int)pid);
                     String activeProcess = proc.MainModule.FileName;
                     String path = Path.GetDirectoryName(activeProcess) + @"\";
-
+                    //if (MessageBox.Show("aaa") == MessageBoxResult.OK) { }
                     if (Path.GetFileName(activeProcess).ToLower() == "finsql.exe")
                     {
                         if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
@@ -56,7 +57,16 @@ namespace NVR_DynamicsNAVProtocolHandler
                             MessageBox.Show("Error", "Same version of RTC was not found!", MessageBoxButton.OK, MessageBoxImage.Error);
                             return;
                         }
-                        RunProcess(navPath, @"""" + args + @"""");
+                        var newUri = NAV_URI_Extender.GetExtendedUri(new Uri(args), pid);
+
+                        if (newUri != null)
+                        {
+                            RunProcess(navPath, @"""" + newUri.ToString() + @"""");
+                        }
+                        else
+                        {
+                            RunProcess(navPath, @"""" + args + @"""");
+                        }
                         return;
                     }
                     else
@@ -206,7 +216,7 @@ namespace NVR_DynamicsNAVProtocolHandler
             Process.Start(procInfo);
             if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.ShowMessageBox)
             {
-               MessageBox.Show("Starting this command:\n"+procInfo.FileName+@""""+param+@"""");
+                if (MessageBox.Show("Starting this command:\n" + procInfo.FileName + @"""" + param + @"""") == MessageBoxResult.OK) { }
             }
             if (!NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.ShowFileInfo)
                 Application.Current.Shutdown();

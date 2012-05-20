@@ -44,8 +44,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IObjectDesigner.cs" />
+    <Compile Include="NAVClient.cs" />
+    <Compile Include="NAVInteroperability.cs" />
     <Compile Include="ObjectDesigner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Win32Helper\Win32Helper.csproj">
+      <Project>{fc7053fb-ce1d-41d8-a5bc-5705df3c9ad8}</Project>
+      <Name>Win32Helper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
