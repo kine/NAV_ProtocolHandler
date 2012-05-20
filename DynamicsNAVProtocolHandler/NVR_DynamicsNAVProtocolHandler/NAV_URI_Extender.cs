@@ -16,8 +16,9 @@ namespace NVR_DynamicsNAVProtocolHandler
             if (target != null)
             {
                 return ReparseUri(URI, target);
-            } else
-            return null;
+            }
+            else
+                return null;
         }
 
         private static Uri ReparseUri(Uri URI, Mapping target)
@@ -27,7 +28,7 @@ namespace NVR_DynamicsNAVProtocolHandler
             if (URI.Authority!="") 
                 return URI;
             var rest = URI.ToString().Substring(16);
-            var result = URI.Scheme + "://" + target.NAVServer +"/"+ target.Instance +"/" + target.Company + rest;
+            var result = URI.Scheme + "://" + target.NavServer +"/"+ target.Instance +"/" + target.Company + rest;
             return new Uri(result);
         }
     }

@@ -24,12 +24,14 @@ namespace NVR_DynamicsNAVProtocolHandler
         public MainWindow()
         {
             InitializeComponent();
+            CheckIfActive();
+            versionLabel.Content = "ver " + System.Diagnostics.FileVersionInfo.GetVersionInfo(Process.GetCurrentProcess().MainModule.FileName).FileVersion;
             if (NVR_DynamicsNAVProtocolHandler.App.haveParams)
             {
                 this.Hide();
-            }
-            CheckIfActive();
-            versionLabel.Content = "ver "+System.Diagnostics.FileVersionInfo.GetVersionInfo(Process.GetCurrentProcess().MainModule.FileName).FileVersion;
+                NAVProtocolHandler.ProcessHandler(App.args);
+                this.Close();
+            } 
         }
 
         private void CheckIfActive()
@@ -89,6 +91,12 @@ namespace NVR_DynamicsNAVProtocolHandler
         private void button_Click_1(object sender, RoutedEventArgs e)
         {
             ChangeActive();
+        }
+
+        private void buttonMapping_Click_1(object sender, RoutedEventArgs e)
+        {
+            var mapping = new MappingEditor();
+            mapping.ShowDialog();
         }
     }
 }
