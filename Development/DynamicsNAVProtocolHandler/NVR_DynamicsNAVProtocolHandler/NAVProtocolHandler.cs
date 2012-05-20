@@ -22,7 +22,8 @@ namespace NVR_DynamicsNAVProtocolHandler
                     Process proc = System.Diagnostics.Process.GetProcessById((int)pid);
                     String activeProcess = proc.MainModule.FileName;
                     String path = Path.GetDirectoryName(activeProcess) + @"\";
-                    //if (MessageBox.Show("aaa") == MessageBoxResult.OK) { }
+                    //for attaching debugger
+                    //if (MessageBox.Show("Attach the debugger...") == MessageBoxResult.OK) { }
                     if (Path.GetFileName(activeProcess).ToLower() == "finsql.exe")
                     {
                         if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
@@ -191,7 +192,6 @@ namespace NVR_DynamicsNAVProtocolHandler
             procInfo.WorkingDirectory = Path.GetDirectoryName(path);
             //procInfo.FileName = Path.GetFileName(path);
 
-            Process.Start(procInfo);
             if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.ShowMessageBox)
             {
                 if (MessageBox.Show("Starting this command:\n" + procInfo.FileName + @" " + param) == MessageBoxResult.OK) { }
@@ -202,8 +202,7 @@ namespace NVR_DynamicsNAVProtocolHandler
             {
                 baloon.Show();
             }
-            if (!NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.ShowFileInfo)
-                Application.Current.Shutdown();
+            Process.Start(procInfo);
         }
     }
 }
