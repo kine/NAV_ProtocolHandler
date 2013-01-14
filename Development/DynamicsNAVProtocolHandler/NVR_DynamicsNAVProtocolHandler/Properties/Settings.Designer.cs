@@ -70,5 +70,17 @@ namespace NVR_DynamicsNAVProtocolHandler.Properties {
                 this["DisableMapping"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoMapping {
+            get {
+                return ((bool)(this["AutoMapping"]));
+            }
+            set {
+                this["AutoMapping"] = value;
+            }
+        }
     }
 }
