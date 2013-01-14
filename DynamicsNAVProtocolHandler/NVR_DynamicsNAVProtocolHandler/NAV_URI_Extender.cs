@@ -9,6 +9,8 @@ namespace NVR_DynamicsNAVProtocolHandler
     {
         public static Uri GetExtendedUri(Uri URI, uint pid)
         {
+            if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.DisableMapping)
+                return null;
             var navClients = new NAV_ROT.NAVClients();
             var navClient = navClients.GetClientByPID(pid);
             var target = NAVClient2URI.GetByServerDB(navClient.ServerName, navClient.DatabaseName, navClient.CompanyName);

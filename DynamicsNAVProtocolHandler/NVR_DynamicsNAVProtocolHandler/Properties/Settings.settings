@@ -9,7 +9,10 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="MappingFile" Type="System.String" Scope="User">
-      <Value Profile="(Default)">mapping.xml</Value>
+      <Value Profile="(Default)">%AppData%\NAVMapping.xml</Value>
+    </Setting>
+    <Setting Name="DisableMapping" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>
