@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 11
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicsNAVProtocolHandler", "NVR_DynamicsNAVProtocolHandler\DynamicsNAVProtocolHandler.csproj", "{9CB279FE-31D2-48A1-AE26-B5636FE78B10}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Win32Helper", "Win32Helper\Win32Helper.csproj", "{FC7053FB-CE1D-41D8-A5BC-5705DF3C9AD8}"
@@ -9,29 +9,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAV_ROT", "NAV_ROT\NAV_ROT.
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccLocalPath0 = .
-		SccLocalPath1 = NVR_DynamicsNAVProtocolHandler
-		SccLocalPath2 = Win32Helper
-		SccLocalPath3 = NAV_ROT
 		SccNumberOfProjects = 4
-		SccProjectName1 = NVR_DynamicsNAVProtocolHandler
-		SccProjectName2 = Win32Helper
-		SccProjectName3 = NAV_ROT
-		SccProjectUniqueName1 = NVR_DynamicsNAVProtocolHandler\\DynamicsNAVProtocolHandler.csproj
-		SccProjectUniqueName2 = Win32Helper\\Win32Helper.csproj
-		SccProjectUniqueName3 = NAV_ROT\\NAV_ROT.csproj
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs37
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = NVR_DynamicsNAVProtocolHandler\\DynamicsNAVProtocolHandler.csproj
+		SccProjectName1 = NVR_DynamicsNAVProtocolHandler
+		SccLocalPath1 = NVR_DynamicsNAVProtocolHandler
+		SccProjectUniqueName2 = Win32Helper\\Win32Helper.csproj
+		SccProjectName2 = Win32Helper
+		SccLocalPath2 = Win32Helper
+		SccProjectUniqueName3 = NAV_ROT\\NAV_ROT.csproj
+		SccProjectName3 = NAV_ROT
+		SccLocalPath3 = NAV_ROT
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{03EDA0AC-F863-426E-BE6B-BD9D5D8F5131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{03EDA0AC-F863-426E-BE6B-BD9D5D8F5131}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{03EDA0AC-F863-426E-BE6B-BD9D5D8F5131}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{03EDA0AC-F863-426E-BE6B-BD9D5D8F5131}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9CB279FE-31D2-48A1-AE26-B5636FE78B10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9CB279FE-31D2-48A1-AE26-B5636FE78B10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9CB279FE-31D2-48A1-AE26-B5636FE78B10}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -40,6 +36,10 @@ Global
 		{FC7053FB-CE1D-41D8-A5BC-5705DF3C9AD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC7053FB-CE1D-41D8-A5BC-5705DF3C9AD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC7053FB-CE1D-41D8-A5BC-5705DF3C9AD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03EDA0AC-F863-426E-BE6B-BD9D5D8F5131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03EDA0AC-F863-426E-BE6B-BD9D5D8F5131}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03EDA0AC-F863-426E-BE6B-BD9D5D8F5131}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03EDA0AC-F863-426E-BE6B-BD9D5D8F5131}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
