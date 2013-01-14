@@ -68,8 +68,9 @@ namespace NVR_DynamicsNAVProtocolHandler
                     mapping.DbServer = DBServer;
                     mapping.Company = company;
                     mapping.Instance = DB;
-                    mapping.NavServer = DBServer.Split('/')[0];
+                    mapping.NavServer = DBServer.Split('/')[0]+":7046";
                     mappings.Add(mapping);
+                    SaveMapping();
                     var resultServerRetry = from r in mappings where r.DbServer == DBServer select r;
                     var resultDBRetry = from r in resultServerRetry where r.Db == DB select r;
                     if ((resultDBRetry.Count() == 0) || (resultDBRetry == null))
