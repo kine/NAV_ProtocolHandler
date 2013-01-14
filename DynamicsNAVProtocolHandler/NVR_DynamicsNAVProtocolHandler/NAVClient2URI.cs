@@ -61,21 +61,41 @@ namespace NVR_DynamicsNAVProtocolHandler
             var resultDB = from r in resultServer where r.Db == DB select r;
             if ((resultDB.Count() == 0) || (resultDB==null))
             {
-                var mapping = new Mapping();
-                mapping.Db = DB;
-                mapping.DbServer = DBServer;
-                mapping.Company = company;
-                var editor = new MappingEditor(mapping);
-                if (editor.ShowDialog()==true)
+                if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.AutoMapping)
                 {
+                    var mapping = new Mapping();
+                    mapping.Db = DB;
+                    mapping.DbServer = DBServer;
+                    mapping.Company = company;
+                    mapping.Instance = DB;
+                    mapping.NavServer = DBServer;
+                    mappings.Add(mapping);
+                    var resultServerRetry = from r in mappings where r.DbServer == DBServer select r;
+                    var resultDBRetry = from r in resultServerRetry where r.Db == DB select r;
+                    if ((resultDBRetry.Count() == 0) || (resultDBRetry == null))
+                    {
+                        return null;
+                    }
+                    return resultDBRetry.First();
                 }
-                var resultServerRetry = from r in mappings where r.DbServer == DBServer select r;
-                var resultDBRetry = from r in resultServerRetry where r.Db == DB select r;
-                if ((resultDBRetry.Count() == 0) || (resultDBRetry == null))
+                else
                 {
-                    return null;
+                    var mapping = new Mapping();
+                    mapping.Db = DB;
+                    mapping.DbServer = DBServer;
+                    mapping.Company = company;
+                    var editor = new MappingEditor(mapping);
+                    if (editor.ShowDialog() == true)
+                    {
+                    }
+                    var resultServerRetry = from r in mappings where r.DbServer == DBServer select r;
+                    var resultDBRetry = from r in resultServerRetry where r.Db == DB select r;
+                    if ((resultDBRetry.Count() == 0) || (resultDBRetry == null))
+                    {
+                        return null;
+                    }
+                    return resultDBRetry.First();
                 }
-                return resultDBRetry.First();
             }
             return resultDB.First();
         }
