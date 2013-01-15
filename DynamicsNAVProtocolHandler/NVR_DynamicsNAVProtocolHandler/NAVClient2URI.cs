@@ -68,7 +68,7 @@ namespace NVR_DynamicsNAVProtocolHandler
                     mapping.DbServer = DBServer;
                     mapping.Company = company;
                     mapping.Instance = DB;
-                    mapping.NavServer = DBServer.Split('/')[0]+":7046";
+                    mapping.NavServer = DBServer.Split('\\')[0]+":"+NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.NAVServerDefaultPort.ToString();
                     mappings.Add(mapping);
                     SaveMapping();
                     var resultServerRetry = from r in mappings where r.DbServer == DBServer select r;
@@ -119,7 +119,7 @@ namespace NVR_DynamicsNAVProtocolHandler
                 mapping.Db="DBName";
                 mapping.DbServer="SQLServername";
                 mapping.Instance="DynamicsNAV";
-                mapping.NavServer="NAVServer:7046";
+                mapping.NavServer="NAVServer:"+NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.NAVServerDefaultPort.ToString();
                 mappings.Add(mapping);
                 SaveMapping();
             }
@@ -127,10 +127,16 @@ namespace NVR_DynamicsNAVProtocolHandler
 
         static public void SaveMapping()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(ObservableCollection<Mapping>));
-            TextWriter writer = new StreamWriter(Environment.ExpandEnvironmentVariables(NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.MappingFile));
-            serializer.Serialize(writer, mappings);
-            writer.Close();
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(ObservableCollection<Mapping>));
+                TextWriter writer = new StreamWriter(Environment.ExpandEnvironmentVariables(NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.MappingFile));
+                serializer.Serialize(writer, mappings);
+                writer.Close();
+            }
+            catch (UnauthorizedAccessException)
+            {
+            }
          }
     }
 }

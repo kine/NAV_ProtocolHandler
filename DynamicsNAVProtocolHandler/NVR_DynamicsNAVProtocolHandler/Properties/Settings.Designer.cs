@@ -82,5 +82,17 @@ namespace NVR_DynamicsNAVProtocolHandler.Properties {
                 this["AutoMapping"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("7046")]
+        public int NAVServerDefaultPort {
+            get {
+                return ((int)(this["NAVServerDefaultPort"]));
+            }
+            set {
+                this["NAVServerDefaultPort"] = value;
+            }
+        }
     }
 }
