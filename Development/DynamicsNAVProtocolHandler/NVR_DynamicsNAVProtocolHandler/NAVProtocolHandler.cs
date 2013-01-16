@@ -23,7 +23,7 @@ namespace NVR_DynamicsNAVProtocolHandler
                     String activeProcess = proc.MainModule.FileName;
                     String path = Path.GetDirectoryName(activeProcess) + @"\";
                     //for attaching debugger
-                    //if (MessageBox.Show("Attach the debugger...") == MessageBoxResult.OK) { }
+                    if (MessageBox.Show("Attach the debugger...") == MessageBoxResult.OK) { }
                     if (Path.GetFileName(activeProcess).ToLower() == "finsql.exe")
                     {
                         if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
@@ -56,7 +56,7 @@ namespace NVR_DynamicsNAVProtocolHandler
                     else
                     {
                         string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
-                        RunProcess(defaultPath.Replace(@" ""%1""", ""), @"""" + uri + @"""");
+                        RunProcess(defaultPath, @"""" + uri + @"""");
                         return;
                         //Use Default
                     }
@@ -64,7 +64,7 @@ namespace NVR_DynamicsNAVProtocolHandler
                 catch (Exception ex)
                 {
                     string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
-                    RunProcess(defaultPath.Replace(@" ""%1""", ""), @"""" + uri + @"""");
+                    RunProcess(defaultPath, @"""" + uri + @"""");
                     return;
                 }
             }
@@ -188,6 +188,8 @@ namespace NVR_DynamicsNAVProtocolHandler
 
         static private void RunProcess(string path, string param)
         {
+            path = path.Replace(@" ""%1""", "");
+            path = path.Replace(@" -protocolhandler", "");
             var procInfo = new ProcessStartInfo(path, param);
             procInfo.WorkingDirectory = Path.GetDirectoryName(path);
             //procInfo.FileName = Path.GetFileName(path);
