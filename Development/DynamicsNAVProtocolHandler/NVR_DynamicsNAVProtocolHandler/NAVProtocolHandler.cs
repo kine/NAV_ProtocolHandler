@@ -11,6 +11,11 @@ namespace NVR_DynamicsNAVProtocolHandler
 {
     class NAVProtocolHandler
     {
+        /// <summary>
+        /// Handler for the DynamicsNAV protocol. Called instead original handler. Based on the uri and last forward NAV client will 
+        /// decide the version of RTC to open and do the rest to open the URL.
+        /// </summary>
+        /// <param name="uri">The DynamicsNAV protocol URI.</param>
         static public void ProcessHandler(string uri)
         {
             try
@@ -23,7 +28,10 @@ namespace NVR_DynamicsNAVProtocolHandler
                     String activeProcess = proc.MainModule.FileName;
                     String path = Path.GetDirectoryName(activeProcess) + @"\";
                     //for attaching debugger
-                    if (MessageBox.Show("Attach the debugger...") == MessageBoxResult.OK) { }
+                    if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.Debug)
+                    {
+                        if (MessageBox.Show("Attach the debugger...") == MessageBoxResult.OK) { }
+                    }
                     if (Path.GetFileName(activeProcess).ToLower() == "finsql.exe")
                     {
                         if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
@@ -74,6 +82,14 @@ namespace NVR_DynamicsNAVProtocolHandler
             }
         }
 
+        /// <summary>
+        /// Traverses the folder tree to find correct version of NAV client.
+        /// </summary>
+        /// <param name="root">The root.</param>
+        /// <param name="filter">The filter.</param>
+        /// <param name="_navClientEXEList">The _nav client EXE list.</param>
+        /// <param name="fileVersion">The file version.</param>
+        /// <exception cref="System.ArgumentException"></exception>
         static private void TraverseTree(string root, string filter, List<string> _navClientEXEList, string fileVersion)
         {
             // Data structure to hold names of subfolders to be
@@ -162,6 +178,12 @@ namespace NVR_DynamicsNAVProtocolHandler
         }
 
 
+        /// <summary>
+        /// Finds the nav client with correct version.
+        /// </summary>
+        /// <param name="fileVersion">The file version.</param>
+        /// <param name="currentFolder">The current folder.</param>
+        /// <returns></returns>
         static private string FindNavClient(string fileVersion, string currentFolder)
         {
             string fileName = "";
@@ -186,6 +208,11 @@ namespace NVR_DynamicsNAVProtocolHandler
             return fileName;
         }
 
+        /// <summary>
+        /// Runs the NAV client.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="param">The param.</param>
         static private void RunProcess(string path, string param)
         {
             path = path.Replace(@" ""%1""", "");

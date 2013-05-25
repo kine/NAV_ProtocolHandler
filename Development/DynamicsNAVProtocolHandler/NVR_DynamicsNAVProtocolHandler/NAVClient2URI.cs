@@ -9,6 +9,9 @@ using System.Xml.Serialization;
 
 namespace NVR_DynamicsNAVProtocolHandler
 {
+    /// <summary>
+    /// This class describes connection between SQL Server name and DB Name and correct NAV Server name and Instance name.
+    /// </summary>
     public class Mapping
     {
         private String dbServer;
@@ -48,6 +51,9 @@ namespace NVR_DynamicsNAVProtocolHandler
         }
     }
 
+    /// <summary>
+    /// Class serve as container for mappings. Doing save and load to/from file.
+    /// </summary>
     class NAVClient2URI
     {
         static public ObservableCollection<Mapping> mappings;
