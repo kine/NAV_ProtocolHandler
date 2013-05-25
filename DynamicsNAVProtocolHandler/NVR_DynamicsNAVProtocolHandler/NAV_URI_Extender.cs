@@ -5,6 +5,9 @@ using System.Text;
 
 namespace NVR_DynamicsNAVProtocolHandler
 {
+    /// <summary>
+    /// Making "magic" with passed URI to find correct version of client and correct target NAV server.
+    /// </summary>
     class NAV_URI_Extender
     {
         public static Uri GetExtendedUri(Uri URI, uint pid)
@@ -23,6 +26,12 @@ namespace NVR_DynamicsNAVProtocolHandler
                 return null;
         }
 
+        /// <summary>
+        /// Reparses the URI - add skipped parts like server name, instance name etc.
+        /// </summary>
+        /// <param name="URI">The URI.</param>
+        /// <param name="target">The target.</param>
+        /// <returns></returns>
         private static Uri ReparseUri(Uri URI, Mapping target)
         {
             //dynamicsnav://///runpage?page=64005
