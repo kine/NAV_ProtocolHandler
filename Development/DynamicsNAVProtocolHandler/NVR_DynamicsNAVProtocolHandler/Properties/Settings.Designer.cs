@@ -98,12 +98,12 @@ namespace NVR_DynamicsNAVProtocolHandler.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Debug {
+        public bool Debugging {
             get {
-                return ((bool)(this["Debug"]));
+                return ((bool)(this["Debugging"]));
             }
             set {
-                this["Debug"] = value;
+                this["Debugging"] = value;
             }
         }
     }
