@@ -20,7 +20,7 @@
     <Setting Name="NAVServerDefaultPort" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">7046</Value>
     </Setting>
-    <Setting Name="Debug" Type="System.Boolean" Scope="User">
+    <Setting Name="Debugging" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

@@ -28,9 +28,9 @@ namespace NVR_DynamicsNAVProtocolHandler
                     String activeProcess = proc.MainModule.FileName;
                     String path = Path.GetDirectoryName(activeProcess) + @"\";
                     //for attaching debugger
-                    if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.Debug)
+                    if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.Debugging)
                     {
-                        if (MessageBox.Show("Attach the debugger...") == MessageBoxResult.OK) { }
+                    if (MessageBox.Show("Attach the debugger...") == MessageBoxResult.OK) { }
                     }
                     if (Path.GetFileName(activeProcess).ToLower() == "finsql.exe")
                     {
@@ -216,7 +216,11 @@ namespace NVR_DynamicsNAVProtocolHandler
         static private void RunProcess(string path, string param)
         {
             path = path.Replace(@" ""%1""", "");
+            if (path.IndexOf("-protocolhandler") > 0)
+            {
             path = path.Replace(@" -protocolhandler", "");
+                param = @"-protocolhandler " + param;
+            }
             var procInfo = new ProcessStartInfo(path, param);
             procInfo.WorkingDirectory = Path.GetDirectoryName(path);
             //procInfo.FileName = Path.GetFileName(path);
