@@ -20,8 +20,12 @@
     <Setting Name="NAVServerDefaultPort" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">7046</Value>
     </Setting>
-    <Setting Name="Debugging" Type="System.Boolean" Scope="User">
+    <Setting Name="Debug" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="NavVersionRegistryKeys" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft Dynamics NAV\60\RoleTailored Client\W1 6.0;
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft Dynamics NAV\70\RoleTailored Client;</Value>
     </Setting>
   </Settings>
 </SettingsFile>

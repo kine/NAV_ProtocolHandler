@@ -98,12 +98,23 @@ namespace NVR_DynamicsNAVProtocolHandler.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Debugging {
+        public bool Debug {
             get {
-                return ((bool)(this["Debugging"]));
+                return ((bool)(this["Debug"]));
             }
             set {
-                this["Debugging"] = value;
+                this["Debug"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft Dynamics NAV\\60\\RoleTailored Clie" +
+            "nt\\W1 6.0;\r\nHKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Microsoft Dynamics NAV\\70\\Role" +
+            "Tailored Client;")]
+        public string NavVersionRegistryKeys {
+            get {
+                return ((string)(this["NavVersionRegistryKeys"]));
             }
         }
     }
