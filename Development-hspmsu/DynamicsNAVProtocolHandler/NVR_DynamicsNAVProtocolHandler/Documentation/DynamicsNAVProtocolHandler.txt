@@ -1,0 +1,26 @@
+v1.1.1.0
+- .NET v3.5 used
+
+v1.0.1.0
+- Added info bar showing the started client path. Could be disabled in .config file
+- Possibility to show dialog box with executed command. Could be enabled in .config file
+- Solved some problem when running NAV 2009 RTC when the RTC is already started (the client app crashed).
+
+DynamicsNAVProtocolHanler v1.0.0.0
+
+Installation: Copy to some folder of your choice, run, activate, close. Try to open some dynamicsnav hyperlink or run page from classic client.
+Prerequisities: Microsoft .NET v3.5
+
+Description: 
+This small app will install itself as dynamicsnav: protocol handler. This protocol is used to run the Microsoft.Dynamics.Nav.Client.exe through hyperlinks. If the hyperlink is triggered by classic client (or development environment for NAV 2013), this app will take the path of the classic client and will try:
+1) Find the Microsoft.Dynamics.Nav.Client.exe in same folder. If found, run this clien to handle the URI.
+2) Find Microsoft.Dynamics.Nav.Client.exe with same version as the calling finsql.exe in folders and subfolder recuresively, starting from ..\.. (parent of parent) folder from the calling classic client folder. This is based on expecting standard folder structure of installed clients.
+3) If the hyperlink was ot triggered by finsql.exe, default associated application is used to hndle the protocol (the one, which was associated when this app was activated).
+
+Reason:
+When you instlal e.g. NAV 2013 side-by-side with NAV 2009, you can have problems to open e.g. pages from the different clients. Even when you have more builds of same version, you can have this problem, running the correct RTC build from the DevEnv. This app should solve that for you.
+
+
+Have fun with the NAV!
+
+Kamil Sacek (Kine)
