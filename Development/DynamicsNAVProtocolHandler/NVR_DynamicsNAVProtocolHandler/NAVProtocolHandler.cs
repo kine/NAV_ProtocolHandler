@@ -12,7 +12,7 @@ namespace NVR_DynamicsNAVProtocolHandler
     class NAVProtocolHandler
     {
         /// <summary>
-        /// Handler for the DynamicsNAV protocol. Called instead original handler. Based on the uri and last forward NAV client will 
+        /// Handler for the DynamicsNAV protocol. Called instead original handler. Based on the uri and last forward NAV client will
         /// decide the version of RTC to open and do the rest to open the URL.
         /// </summary>
         /// <param name="uri">The DynamicsNAV protocol URI.</param>
@@ -25,46 +25,22 @@ namespace NVR_DynamicsNAVProtocolHandler
                 {
                     Win32Helper.Win32.User32.GetWindowThreadProcessId(Win32.User32.GetForegroundWindow(), out pid);
                     Process proc = System.Diagnostics.Process.GetProcessById((int)pid);
-                    String activeProcess = proc.MainModule.FileName;
-                    String path = Path.GetDirectoryName(activeProcess) + @"\";
+                    String activeProcessFolder = proc.MainModule.FileName;
+                    String path = Path.GetDirectoryName(activeProcessFolder) + @"\";
                     //for attaching debugger
-                    if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.Debugging)
+                    if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.Debug)
                     {
                     if (MessageBox.Show("Attach the debugger...") == MessageBoxResult.OK) { }
                     }
-                    if (Path.GetFileName(activeProcess).ToLower() == "finsql.exe")
-                    {
-                        if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
-                        //Runs the client from same folder as calling process
-                        {
-                            RunProcess(path + "Microsoft.Dynamics.Nav.Client.exe", @"""" + uri + @"""");
-                            return;
-                        }
-
-                        var versionInfo = FileVersionInfo.GetVersionInfo(activeProcess);
-                        var fileVersion = versionInfo.FileVersion;
-                        var navPath = FindNavClient(fileVersion, activeProcess);
-                        if (String.IsNullOrEmpty(navPath))
-                        {
-                            MessageBox.Show("Error", "Same version of RTC was not found!", MessageBoxButton.OK, MessageBoxImage.Error);
-                            return;
-                        }
-                        var newUri = NAV_URI_Extender.GetExtendedUri(new Uri(uri), pid);
-
-                        if (newUri != null)
-                        {
-                            RunProcess(navPath, @"""" + newUri.ToString() + @"""");
-                        }
-                        else
-                        {
-                            RunProcess(navPath, @"""" + uri + @"""");
-                        }
+                    if ((Path.GetFileName(activeProcessFolder).ToLower() == "finsql.exe") ||
+                        (Path.GetFileName(activeProcessFolder).ToLower() == "Microsoft.Dynamics.Nav.Client.exe"))
+                    { //Known client, take the version from the client
+                        RunFromClient(uri, pid, activeProcessFolder, path);
                         return;
                     }
                     else
-                    {
-                        string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
-                        RunProcess(defaultPath, @"""" + uri + @"""");
+                    {//Unknown client, check mapping
+                        RunFromUnknown(uri);
                         return;
                         //Use Default
                     }
@@ -80,6 +56,106 @@ namespace NVR_DynamicsNAVProtocolHandler
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// The URI was fired from unknown client (outside NAV client).
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        private static void RunFromUnknown(string uri)
+        {
+            var fileVersion = NAV_URI_Extender.GetVersionFromMapping(uri);
+            if (fileVersion == null)
+            {
+                string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
+                RunProcess(defaultPath, @"""" + uri + @"""");
+                return;
+            }
+            foreach (String navVersionFolder in GetNavVersionFolders()) {
+                if (RunForVersion(uri, 0, navVersionFolder, fileVersion, false))
+                {
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the nav version folders from registry.
+        /// </summary>
+        /// <returns></returns>
+        private static IEnumerable<string> GetNavVersionFolders()
+        {
+            var folders = new List<String>();
+            foreach (String registryPath in new List<String>(NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.NavVersionRegistryKeys.Split(';')))
+            {
+                try
+                {
+                    var folder = (String)Microsoft.Win32.Registry.GetValue(registryPath, "Path", "");
+                    folders.Add(folder);
+                }
+                catch (Exception e)
+                {
+                }
+            }
+            return folders;
+        }
+
+        /// <summary>
+        /// The URI was fired from NAV client.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="pid">The NAV client pid.</param>
+        /// <param name="activeProcessFolder">The active process folder.</param>
+        /// <param name="path">The path.</param>
+        private static void RunFromClient(string uri, uint pid, String activeProcessFolder, String path)
+        {
+            var versionInfo = FileVersionInfo.GetVersionInfo(activeProcessFolder);
+            var fileVersion = versionInfo.FileVersion;
+
+            NAVClient2URI.UpdateVersion(uri, fileVersion);
+
+            if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
+            //Runs the client from same folder as calling process
+            {
+                RunProcess(path + "Microsoft.Dynamics.Nav.Client.exe", @"""" + uri + @"""");
+                return;
+            }
+
+            RunForVersion(uri, pid, activeProcessFolder, fileVersion);
+        }
+
+        /// <summary>
+        /// Runs the URI for specified version.
+        /// </summary>
+        /// <param name="uri">The URI.</param>
+        /// <param name="pid">The pid.</param>
+        /// <param name="activeProcessFolder">The active process folder.</param>
+        /// <param name="fileVersion">The file version.</param>
+        /// <param name="showMessageIfNotFound">if set to <c>true</c> [show message if not found].</param>
+        /// <returns></returns>
+        private static bool RunForVersion(string uri, uint pid, String activeProcessFolder, string fileVersion, bool showMessageIfNotFound=true)
+        {
+            var navPath = FindNavClient(fileVersion, activeProcessFolder);
+            if (String.IsNullOrEmpty(navPath))
+            {
+                if (!showMessageIfNotFound)
+                {
+                    MessageBox.Show("Error", "Version "+fileVersion+" of RTC was not found!", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                return false;
+            }
+            if (pid != 0)
+            {
+                var newUri = NAV_URI_Extender.GetExtendedUri(new Uri(uri), pid);
+
+                if (newUri != null)
+                {
+                    RunProcess(navPath, @"""" + newUri.ToString() + @"""");
+                    return true;
+                }
+            }
+            RunProcess(navPath, @"""" + uri + @"""");
+            return true;
         }
 
         /// <summary>
@@ -237,5 +313,6 @@ namespace NVR_DynamicsNAVProtocolHandler
             }
             Process.Start(procInfo);
         }
+
     }
 }

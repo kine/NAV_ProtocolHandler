@@ -49,6 +49,41 @@ namespace NVR_DynamicsNAVProtocolHandler
             get { return instance; }
             set { instance = value; }
         }
+
+        private String version="";
+
+        public String Version
+        {
+            get { return version; }
+            set { version = value; }
+        }
+    }
+
+    /// <summary>
+    /// Represents the NAV URI in format dynamicsnav:\\server:port\instance\...
+    /// </summary>
+    class NAV_URI
+    {
+        Uri uri;
+
+        public NAV_URI(Uri URI)
+        {
+            uri = URI;
+        }
+
+        public NAV_URI(String URI)
+        {
+            uri = new Uri(URI);
+        }
+
+        public String Server
+        {
+            get { return uri.ToString().Split('\\')[1]; }
+        }
+        public String Instance
+        {
+            get { return uri.ToString().Split('\\')[2]; }
+        }
     }
 
     /// <summary>
@@ -57,8 +92,49 @@ namespace NVR_DynamicsNAVProtocolHandler
     class NAVClient2URI
     {
         static public ObservableCollection<Mapping> mappings;
-        
 
+        static public Mapping GetByURI(String URI)
+        {
+            if (mappings == null)
+                LoadMapping();
+            var navUri = new NAV_URI(URI);
+            var resultServer = from r in mappings where r.NavServer == navUri.Server select r;
+            var resultDB = from r in resultServer where r.Instance == navUri.Instance select r;
+            if ((resultDB.Count() == 0) || (resultDB == null))
+            {
+                return null;
+            }
+            else
+            {
+                return resultDB.First();
+            }
+        }
+
+        static public void UpdateVersion(String uri, String version)
+        {
+            var mapping = GetByURI(uri);
+            if (mapping == null)
+                return;
+
+            if (!String.IsNullOrEmpty(mapping.Version) && mapping.Version != version)
+            {
+                if (MessageBox.Show("You are trying to use different version to connect to selected NAV Server\n" +
+                    "Actual stored version: " + mapping.Version + "\n" +
+                    "New version: " + version + "\n\n" + "Do you want to update the stored version?",
+                    "Update the version?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    return;
+            }
+            mapping.Version = version;
+            SaveMapping();
+        }
+
+        /// <summary>
+        /// Gets the mapping by server name and DB name.
+        /// </summary>
+        /// <param name="DBServer">The DB server name.</param>
+        /// <param name="DB">The DB name.</param>
+        /// <param name="company">The company name.</param>
+        /// <returns></returns>
         static public Mapping GetByServerDB(string DBServer, string DB, string company)
         {
             if (mappings == null)
