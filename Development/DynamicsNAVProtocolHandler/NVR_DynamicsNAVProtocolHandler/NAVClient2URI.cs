@@ -78,11 +78,11 @@ namespace NVR_DynamicsNAVProtocolHandler
 
         public String Server
         {
-            get { return uri.ToString().Split('\\')[1]; }
+            get { return uri.ToString().Split('/')[2]; }
         }
         public String Instance
         {
-            get { return uri.ToString().Split('\\')[2]; }
+            get { return uri.ToString().Split('/')[3]; }
         }
     }
 
