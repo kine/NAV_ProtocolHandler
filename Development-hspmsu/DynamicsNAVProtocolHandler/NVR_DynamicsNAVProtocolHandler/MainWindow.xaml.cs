@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Security;
 using System.ComponentModel;
+using System.Security.Principal;
 
 namespace NVR_DynamicsNAVProtocolHandler
 {
@@ -59,37 +60,55 @@ namespace NVR_DynamicsNAVProtocolHandler
 
         private void ActivateHandler()
         {
-            try
-            {
-                string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "", "");
-                Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", defaultPath, Microsoft.Win32.RegistryValueKind.String);
-                Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "", Process.GetCurrentProcess().MainModule.FileName + @" ""%1""");
-            }
-            catch (Exception e)
+            WindowsPrincipal pricipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            bool hasAdministrativeRight = pricipal.IsInRole(WindowsBuiltInRole.Administrator);
+
+            if (!hasAdministrativeRight)
             {
                 if (MessageBox.Show("You do not have enough permissions to modify the registry.\nRe-run the app as Administrator?", "Security Error", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
-                    this.Hide();
                     RunElevated(Process.GetCurrentProcess().MainModule.FileName, "");
                     this.Close();
+                }
+            }
+            else
+            {
+                try
+                {
+                    string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "", "");
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", defaultPath, Microsoft.Win32.RegistryValueKind.String);
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "", Process.GetCurrentProcess().MainModule.FileName + @" ""%1""");
+                }
+                catch (SecurityException e)
+                {
+                    MessageBox.Show("Security Error", "You do not have enough permissions to modify the registry.\nTry to run the app as Administrator");
                 }
             }
         }
 
         private void DeactivateHandler()
         {
-            try {
-                string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
-                Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "", defaultPath);
-                Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
-            }
-            catch (Exception e)
+            WindowsPrincipal pricipal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            bool hasAdministrativeRight = pricipal.IsInRole(WindowsBuiltInRole.Administrator);
+
+            if (!hasAdministrativeRight)
             {
                 if (MessageBox.Show("You do not have enough permissions to modify the registry.\nRe-run the app as Administrator?", "Security Error", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
-                    this.Hide();
                     RunElevated(Process.GetCurrentProcess().MainModule.FileName, "");
                     this.Close();
+                }
+            } else {
+
+                try
+                {
+                    string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "", defaultPath);
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
+                }
+                catch (SecurityException e)
+                {
+                    MessageBox.Show("Security Error", "You do not have enough permissions to modify the registry.\nTry to run the app as Administrator");
                 }
             }
         }
@@ -122,8 +141,7 @@ namespace NVR_DynamicsNAVProtocolHandler
             }
             catch (Win32Exception)
             {
-                //Do nothing. Probably the user canceled the UAC window
-                //so stop execution
+                //so stop execution, the user may cancled UAC
             }
         }
 
