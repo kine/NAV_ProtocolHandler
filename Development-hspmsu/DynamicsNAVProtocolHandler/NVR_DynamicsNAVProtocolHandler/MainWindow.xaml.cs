@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using System.Security;
+using System.ComponentModel;
 
 namespace NVR_DynamicsNAVProtocolHandler
 {
@@ -64,9 +65,14 @@ namespace NVR_DynamicsNAVProtocolHandler
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", defaultPath, Microsoft.Win32.RegistryValueKind.String);
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "", Process.GetCurrentProcess().MainModule.FileName + @" ""%1""");
             }
-            catch (SecurityException e)
+            catch (Exception e)
             {
-                MessageBox.Show("Security Error", "You do not have enough permissions to modify the registry.\nTry to run the app as Administrator");
+                if (MessageBox.Show("You do not have enough permissions to modify the registry.\nRe-run the app as Administrator?", "Security Error", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    this.Hide();
+                    RunElevated(Process.GetCurrentProcess().MainModule.FileName, "");
+                    this.Close();
+                }
             }
         }
 
@@ -77,9 +83,14 @@ namespace NVR_DynamicsNAVProtocolHandler
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "", defaultPath);
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
             }
-            catch (SecurityException e)
+            catch (Exception e)
             {
-                MessageBox.Show("Security Error", "You do not have enough permissions to modify the registry.\nTry to run the app as Administrator");
+                if (MessageBox.Show("You do not have enough permissions to modify the registry.\nRe-run the app as Administrator?", "Security Error", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    this.Hide();
+                    RunElevated(Process.GetCurrentProcess().MainModule.FileName, "");
+                    this.Close();
+                }
             }
         }
 
@@ -98,5 +109,23 @@ namespace NVR_DynamicsNAVProtocolHandler
             var mapping = new MappingEditor();
             mapping.ShowDialog();
         }
+
+        private static void RunElevated(string fileName, string Args)
+        {
+            ProcessStartInfo processInfo = new ProcessStartInfo();
+            processInfo.Verb = "runas";
+            processInfo.FileName = fileName;
+            processInfo.Arguments = Args;
+            try
+            {
+                Process.Start(processInfo);
+            }
+            catch (Win32Exception)
+            {
+                //Do nothing. Probably the user canceled the UAC window
+                //so stop execution
+            }
+        }
+
     }
 }
