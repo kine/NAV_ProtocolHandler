@@ -1,0 +1,120 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="NVR_DynamicsNAVProtocolHandler.MappingEditor"
+        xmlns:local="clr-namespace:NVR_DynamicsNAVProtocolHandler"
+        Title="NAV Protocol Handler Mapping Editor" Height="316" Width="479">
+    <Window.CommandBindings>
+        <CommandBinding x:Name="DeleteMappingCommand" Command="local:Commands.DeleteMappingCommand" CanExecute="DeleteMappingCommand_CanExecute_1" Executed="DeleteMappingCommand_Executed_1" />
+    </Window.CommandBindings>
+    <Window.Resources>
+        <DataTemplate x:Key="mappingRowDatateplate">
+            <Border x:Name="border" BorderThickness="1" BorderBrush="Black" CornerRadius="3" Padding="3" HorizontalAlignment="Stretch">
+                <Border.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FFA7A7A7" Offset="0"/>
+                        <GradientStop Color="White" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="SQL Server: " FontWeight="Bold" />
+                        <TextBox Text="{Binding DBServer, FallbackValue=dbversion}"/>
+                        <TextBlock Text="  DB: " FontWeight="Bold" />
+                        <TextBox Text="{Binding DB, FallbackValue=dbname}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="NAV Server: " FontWeight="Bold" />
+                        <TextBox Text="{Binding NAVServer, FallbackValue=navserver}" />
+                        <TextBlock Text="Instance: " FontWeight="Bold" />
+                        <TextBox Text="{Binding Instance, FallbackValue=instance}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid Height="278" VerticalAlignment="Top">
+        <ListView Margin="10,10,10,0" Name="list" Height="179" VerticalAlignment="Top" SelectionMode="Single"><ListView.View>
+                <GridView>
+                    <GridViewColumn Header="SQL Server" x:Name="SQLServerColumn">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding Path=DbServer}" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="SQL DB" x:Name="DbColumn">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding Path=Db}" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="NAV Server" x:Name="NavServerColumn">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding Path=NavServer}" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Instance" x:Name="InstanceColumn">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding Path=Instance}" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Version" x:Name="VersionColumn">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding Path=Version}" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                </GridView>
+
+            </ListView.View>
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="local:Commands.DeleteMappingCommand" Header="Delete Mapping" />
+                </ContextMenu>
+            </ListView.ContextMenu>
+        </ListView>
+        <Button Content="Close" Margin="0,0,10,5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" IsDefault="True" Click="Button_Click_1"/>
+        <StackPanel Height="52" Margin="10,0,10,32" VerticalAlignment="Bottom" Orientation="Horizontal">
+            <StackPanel Orientation="Vertical">
+                <Label Content="SQL Server:"/>
+                <TextBox Text="{Binding SelectedItem.DbServer, ElementName=list}"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="SQL DB:"/>
+                <TextBox Text="{Binding SelectedItem.Db, ElementName=list}"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="NAV Server:"/>
+                <TextBox Text="{Binding SelectedItem.NavServer, ElementName=list}" Name="navServerTextBox"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="Instance:"/>
+                <TextBox Text="{Binding SelectedItem.Instance, ElementName=list}" />
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="Version:"/>
+                <TextBox Text="{Binding SelectedItem.Version, ElementName=list}" />
+            </StackPanel>
+        </StackPanel>
+
+
+    </Grid>
+</Window>

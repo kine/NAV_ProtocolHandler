@@ -1,0 +1,31 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="NVR_DynamicsNAVProtocolHandler.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ShowFileInfo" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ShowMessageBox" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="MappingFile" Type="System.String" Scope="User">
+      <Value Profile="(Default)">%AppData%\NAVMapping.xml</Value>
+    </Setting>
+    <Setting Name="DisableMapping" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AutoMapping" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="NAVServerDefaultPort" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">7046</Value>
+    </Setting>
+    <Setting Name="Debug" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="NavVersionRegistryKeys" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft Dynamics NAV\60\RoleTailored Client\W1 6.0;
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft Dynamics NAV\70\RoleTailored Client;</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
