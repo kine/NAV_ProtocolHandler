@@ -72,6 +72,15 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    <GridViewColumn Header="Version" x:Name="VersionColumn">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding Path=Version}" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
 
                 </GridView>
 
@@ -99,6 +108,10 @@
             <StackPanel Orientation="Vertical">
                 <Label Content="Instance:"/>
                 <TextBox Text="{Binding SelectedItem.Instance, ElementName=list}" />
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="Version:"/>
+                <TextBox Text="{Binding SelectedItem.Version, ElementName=list}" />
             </StackPanel>
         </StackPanel>
 
