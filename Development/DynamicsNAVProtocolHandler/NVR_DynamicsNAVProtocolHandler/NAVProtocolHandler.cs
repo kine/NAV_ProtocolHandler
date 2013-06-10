@@ -40,6 +40,7 @@ namespace NVR_DynamicsNAVProtocolHandler
                     }
                     else
                     {//Unknown client, check mapping
+                        RunFromUnknown(uri);
                         return;
                         //Use Default
                     }
@@ -145,7 +146,7 @@ namespace NVR_DynamicsNAVProtocolHandler
             var navPath = FindNavClient(fileVersion, activeProcessFolder);
             if (String.IsNullOrEmpty(navPath))
             {
-                if (!showMessageIfNotFound)
+                if (!showMessageIfNotFound && NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.)
                 {
                     MessageBox.Show("Error", "Version "+fileVersion+" of RTC was not found!", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
