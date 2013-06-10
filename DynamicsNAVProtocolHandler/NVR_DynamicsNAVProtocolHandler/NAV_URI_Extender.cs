@@ -10,6 +10,19 @@ namespace NVR_DynamicsNAVProtocolHandler
     /// </summary>
     class NAV_URI_Extender
     {
+        public static String GetVersionFromMapping(String URI)
+        {
+            var target = NAVClient2URI.GetByURI(URI);
+            if (target != null)
+            {
+                return target.Version;
+            }
+            else
+            {
+                return "";
+            }
+        }
+
         public static Uri GetExtendedUri(Uri URI, uint pid)
         {
             if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.DisableMapping)
