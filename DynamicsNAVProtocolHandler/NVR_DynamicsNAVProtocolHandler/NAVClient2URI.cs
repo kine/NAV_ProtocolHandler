@@ -39,14 +39,24 @@ namespace NVR_DynamicsNAVProtocolHandler
 
         public String NavServer
         {
-            get { return navServer; }
+            get {
+                if (String.IsNullOrEmpty(navServer))
+                    return "";
+                else
+                    return navServer; 
+            }
             set { navServer = value; }
         }
         private String instance;
 
         public String Instance
         {
-            get { return instance; }
+            get { 
+                if (String.IsNullOrEmpty(instance))
+                    return "";
+                else
+                    return instance; 
+            }
             set { instance = value; }
         }
 
@@ -60,7 +70,7 @@ namespace NVR_DynamicsNAVProtocolHandler
     }
 
     /// <summary>
-    /// Represents the NAV URI in format dynamicsnav:\\server:port\instance\...
+    /// Represents the NAV URI in format dynamicsnav://server:port/instance..
     /// </summary>
     class NAV_URI
     {
@@ -98,8 +108,8 @@ namespace NVR_DynamicsNAVProtocolHandler
             if (mappings == null)
                 LoadMapping();
             var navUri = new NAV_URI(URI);
-            var resultServer = from r in mappings where r.NavServer == navUri.Server select r;
-            var resultDB = from r in resultServer where r.Instance == navUri.Instance select r;
+            var resultServer = from r in mappings where r.NavServer.ToUpper() == navUri.Server.ToUpper() select r;
+            var resultDB = from r in resultServer where r.Instance.ToUpper() == navUri.Instance.ToUpper() select r;
             if ((resultDB.Count() == 0) || (resultDB == null))
             {
                 return null;

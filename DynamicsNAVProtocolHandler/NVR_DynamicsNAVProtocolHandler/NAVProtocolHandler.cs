@@ -68,24 +68,26 @@ namespace NVR_DynamicsNAVProtocolHandler
         private static void RunFromUnknown(string uri)
         {
             var fileVersion = NAV_URI_Extender.GetVersionFromMapping(uri);
-            if (fileVersion == null)
+
+            if (String.IsNullOrEmpty(fileVersion) && uri.ToLower().Contains("?buildversion="))
+                fileVersion = NAV_URI_Extender.GetVersionFromUri(uri);
+
+            if (String.IsNullOrEmpty(fileVersion))
             {
                 string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
-                string parameters = @"""" + uri + @"""";
-
-                if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.CreateSettingsFile)
-                {
-                    string settingsfile = prepareCUS(uri);
-                    if (!String.IsNullOrEmpty(settingsfile))
-                        parameters = @"-settings:""" + settingsfile + @""" " + parameters;
-                }
-                RunProcess(defaultPath, parameters);
+                defaultPath = defaultPath.Replace("\"%1\"","");
+                string version = System.Diagnostics.FileVersionInfo.GetVersionInfo(defaultPath).FileVersion;
+                RunForVersion(uri, defaultPath, fileVersion, false);
                 return;
             }
-            foreach (String navVersionFolder in GetNavVersionFolders()) {
-                if (RunForVersion(uri, navVersionFolder, fileVersion, false))
+            else
+            {
+                foreach (String navVersionFolder in GetNavVersionFolders())
                 {
-                    return;
+                    if (RunForVersion(uri, navVersionFolder, fileVersion, false))
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -101,7 +103,8 @@ namespace NVR_DynamicsNAVProtocolHandler
             {
                 try
                 {
-                    var folder = (String)Microsoft.Win32.Registry.GetValue(registryPath.Replace(System.Environment.NewLine, ""), "Path", "");
+                    // We have to replace \r\n or the second "getValue" will fail, because of malformed registry-key
+                    var folder = (String)Microsoft.Win32.Registry.GetValue(registryPath.Replace(Environment.NewLine,""), "Path", "");
                     folders.Add(folder);
                 }
                 catch (Exception e)
@@ -135,16 +138,10 @@ namespace NVR_DynamicsNAVProtocolHandler
             if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
             //Runs the client from same folder as calling process
             {
-                string parameters = @"""" + uri + @"""";
-
-                if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.CreateSettingsFile)
-                {
-                    string settingsfile = prepareCUS(uri);
-                    if (!String.IsNullOrEmpty(settingsfile))
-                        parameters = @"-settings:""" + settingsfile + @""" " + parameters;
-                }
-
-                RunProcess(path + "Microsoft.Dynamics.Nav.Client.exe", parameters);
+                var navClient = NAVClientFactory.GetObject(fileVersion);
+                navClient.Path=path + "Microsoft.Dynamics.Nav.Client.exe";
+                navClient.Uri=uri;
+                RunProcess(navClient);
                 return;
             }
 
@@ -165,21 +162,16 @@ namespace NVR_DynamicsNAVProtocolHandler
             var navPath = FindNavClient(fileVersion, activeProcessFolder);
             if (String.IsNullOrEmpty(navPath))
             {
-                if (!showMessageIfNotFound && NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.ShowMessageBox)
+                if (showMessageIfNotFound)
                 {
                     MessageBox.Show("Version " + fileVersion + " of RTC was not found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 return false;
             }
-            string parameters = @"""" + uri + @"""";
-
-            if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.CreateSettingsFile)
-            {
-                string settingsfile = prepareCUS(uri);
-                if (!String.IsNullOrEmpty(settingsfile))
-                    parameters = @"-settings:""" + settingsfile + @""" " + parameters;
-            }
-            RunProcess(navPath, parameters);
+            var navClient = NAVClientFactory.GetObject(fileVersion);
+            navClient.Uri = uri;
+            navClient.Path = navPath;
+            RunProcess(navClient);
             return true;
         }
 
@@ -310,134 +302,23 @@ namespace NVR_DynamicsNAVProtocolHandler
         }
 
         /// <summary>
-        /// Create a valid CustomUserSettings.config for the given url to satisfy the RTC and avoid security warning dialog.
-        /// </summary>
-        /// <param name="path">The URI.</param>
-        private static string prepareCUS(string url)
-        {
-            // Skip settingsfile preparation if this feature is disabled by our config
-            if (!NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.CreateSettingsFile)
-                return "";
-
-            // get the default path to the std. CustomUserSettings.config
-            // should be c:\programdata\Microsoft\Microsoft Dynamics NAV for both 2009 and 2013
-            String stdCUS = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Microsoft\\Microsoft Dynamics NAV";
-
-            // get the user appdata path to save the prepared CustomUserSettings.config
-            String userCUS = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Microsoft\\Microsoft Dynamics NAV";
-
-            // parse the URL and store the values of the properties we need
-            Hashtable props = new Hashtable();
-
-            // if the url contains server:port
-            if (url.Split('/')[2].Contains(":"))
-            {
-                props.Add("Server", url.Split('/')[2].Split(':')[0]);
-                props.Add("ServerPort", url.Split('/')[2].Split(':')[1]);
-            }
-            else
-            {
-                // the port is missing, set the default value from config
-                props.Add("Server", url.Split('/')[2]);
-                props.Add("ServerPort", NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.NAVServerDefaultPort);
-            }
-            props.Add("ServerInstance", url.Split('/')[3]);
-            // clear "predefined" values
-            props.Add("UrlHistory", "");
-            props.Add("UnknownSpnHint", "");
-
-            FileInfo CUS = new FileInfo(stdCUS + "\\ClientUserSettings.config");
-
-            // generate the full path for the prepared customusersettings.config
-            FileInfo preparedCUS = new FileInfo(userCUS + "\\" + props["Server"] + "_" + props["ServerInstance"] + ".config");
-
-            // if the file already exists return the path of it
-            if (preparedCUS.Exists)
-                return preparedCUS.FullName;
-
-            if (CUS != null)
-            {
-                if (CUS.Exists)
-                {
-                    try
-                    {
-                        //Create the new CUS from the stdCUS.
-                        XmlDocument doc = new XmlDocument();
-                        doc.Load(CUS.FullName);
-                        XmlNode node = doc.SelectSingleNode("//appSettings");
-
-                        foreach (string parameter in new string[] { "UnknownSpnHint", "UrlHistory", "ServerPort", "ServerInstance", "Server" })
-                        {
-                            XmlElement elem = (XmlElement)node.SelectSingleNode(string.Format("//add[@key='{0}']", parameter));
-
-                            if (elem != null)
-                            {
-                                // get the property from the hashtable and set the value for the given key 
-                                elem.SetAttribute("value", (string)props[parameter]);
-                            }
-                            else
-                            {
-                                string tempstr = (string)props[parameter];
-                                // key was not found so create the 'add' element
-                                // and set it's key/value attributes
-                                elem = doc.CreateElement("add");
-                                elem.SetAttribute("key", parameter);
-                                elem.SetAttribute("value", tempstr);
-                                node.AppendChild(elem);
-                            }
-                        }
-
-                        // on a clean freshly installed system this path does not exist, so we need to create it
-                        // to avoid the exception "parts of the path do not exist"
-                        if (!Directory.Exists(userCUS))
-                            Directory.CreateDirectory(userCUS);
-
-                        // save the NEW CUS at the generated path
-                        doc.Save(preparedCUS.FullName);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.Debug)
-                        {
-                            if (MessageBox.Show("Exception ...\n" + ex.Message, "[prepCUS]") == MessageBoxResult.OK) { }
-                        }
-                        // something bad happend, skip the settings
-                        return "";
-                    }
-                }
-            }
-            return preparedCUS.FullName;
-        }
-
-        /// <summary>
         /// Runs the NAV client.
         /// </summary>
         /// <param name="path">The path.</param>
         /// <param name="param">The param.</param>
-        static private void RunProcess(string path, string param)
+        static private void RunProcess(NAVClient navClient)
         {
-            path = path.Replace(@" ""%1""", "");
-            if (path.IndexOf("-protocolhandler") > 0)
-            {
-            path = path.Replace(@" -protocolhandler", "");
-                param = @"-protocolhandler " + param;
-            }
-
-            var procInfo = new ProcessStartInfo(path, param);
-            procInfo.WorkingDirectory = Path.GetDirectoryName(path);
-            //procInfo.FileName = Path.GetFileName(path);
             if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.ShowMessageBox)
             {
-                if (MessageBox.Show("Starting this command:\n" + procInfo.FileName + @" " + param) == MessageBoxResult.OK) { }
+                if (MessageBox.Show("Starting this command:\n" + navClient.Path + @" " + navClient.Param) == MessageBoxResult.OK) { }
             }
 
-            var baloon = new Toaster(path);
+            var baloon = new Toaster(navClient.Path);
             if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.ShowFileInfo)
             {
                 baloon.Show();
             }
-            Process.Start(procInfo);
+            navClient.RunClient();
         }
-
     }
 }

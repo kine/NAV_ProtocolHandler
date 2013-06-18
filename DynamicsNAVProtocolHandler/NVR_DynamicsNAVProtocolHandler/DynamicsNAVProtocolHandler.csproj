@@ -83,6 +83,7 @@
     <Compile Include="MappingEditor.xaml.cs">
       <DependentUpon>MappingEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NAVClient.cs" />
     <Compile Include="NAVClient2URI.cs" />
     <Compile Include="NAVProtocolHandler.cs" />
     <Compile Include="NAV_URI_Extender.cs" />
@@ -179,7 +180,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties BuildVersion_StartDate="2013/1/1" BuildVersion_BuildVersioningStyle="None.None.None.Increment" BuildVersion_UpdateFileVersion="True" BuildVersion_UpdateAssemblyVersion="True" />
+      <UserProperties BuildVersion_UpdateAssemblyVersion="True" BuildVersion_UpdateFileVersion="True" BuildVersion_BuildVersioningStyle="None.None.None.Increment" BuildVersion_StartDate="2013/1/1" />
     </VisualStudio>
   </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
