@@ -105,6 +105,8 @@ namespace NVR_DynamicsNAVProtocolHandler
             Uri = _uri;
         }
 
+        abstract public void PreRun();
+        abstract public void PostRun();
         abstract public void RunClient(); 
     }
 
@@ -122,7 +124,17 @@ namespace NVR_DynamicsNAVProtocolHandler
         {
             var procInfo = new ProcessStartInfo(Path, @"""" + Uri + @"""");
             procInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(Path);
+            PreRun();
             Process.Start(procInfo);
+            PostRun();
+        }
+
+        public override void PreRun()
+        {
+        }
+
+        public override void PostRun()
+        {
         }
     }
 }
