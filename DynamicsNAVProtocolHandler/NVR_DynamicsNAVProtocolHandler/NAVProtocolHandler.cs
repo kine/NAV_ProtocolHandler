@@ -70,7 +70,12 @@ namespace NVR_DynamicsNAVProtocolHandler
             var fileVersion = NAV_URI_Extender.GetVersionFromMapping(uri);
 
             if (String.IsNullOrEmpty(fileVersion) && uri.ToLower().Contains("?buildversion="))
+            {
                 fileVersion = NAV_URI_Extender.GetVersionFromUri(uri);
+                // We need to remove the version string, NAV6 does not like it
+                // in NAV7 it is ignored
+                uri = uri.Replace("?buildversion=" + fileVersion, "");
+            }
 
             if (String.IsNullOrEmpty(fileVersion))
             {
@@ -105,7 +110,9 @@ namespace NVR_DynamicsNAVProtocolHandler
                 {
                     // We have to replace \r\n or the second "getValue" will fail, because of malformed registry-key
                     var folder = (String)Microsoft.Win32.Registry.GetValue(registryPath.Replace(Environment.NewLine,""), "Path", "");
-                    folders.Add(folder);
+                    // Add folder only if it exists
+                    if (Directory.Exists(folder))
+                        folders.Add(folder);
                 }
                 catch (Exception e)
                 {
@@ -127,10 +134,14 @@ namespace NVR_DynamicsNAVProtocolHandler
             var fileVersion = versionInfo.FileVersion;
             if (pid != 0)
             {
-                var newUri = NAV_URI_Extender.GetExtendedUri(new Uri(uri), pid);
-                if (newUri != null)
+                // Only trigger GetExtendedUri if uri does not contain service tier server and instance
+                if (uri.Contains("////"))
                 {
-                    uri = newUri.ToString();
+                    var newUri = NAV_URI_Extender.GetExtendedUri(new Uri(uri), pid);
+                    if (newUri != null)
+                    {
+                        uri = newUri.ToString();
+                    }
                 }
             }
 
