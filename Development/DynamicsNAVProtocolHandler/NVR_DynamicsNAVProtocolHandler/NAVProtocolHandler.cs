@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Xml;
 using Win32Helper;
 
 namespace NVR_DynamicsNAVProtocolHandler
@@ -66,19 +68,31 @@ namespace NVR_DynamicsNAVProtocolHandler
         private static void RunFromUnknown(string uri)
         {
             var fileVersion = NAV_URI_Extender.GetVersionFromMapping(uri);
-            if (fileVersion == null)
+
+            if (String.IsNullOrEmpty(fileVersion) && uri.ToLower().Contains("?buildversion="))
+            {
+                fileVersion = NAV_URI_Extender.GetVersionFromUri(uri);
+                // We need to remove the version string, NAV6 does not like it
+                // in NAV7 it is ignored
+                uri = uri.Replace("?buildversion=" + fileVersion, "");
+            }
+
+            if (String.IsNullOrEmpty(fileVersion))
             {
                 string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
+                defaultPath = defaultPath.Replace("\"%1\"","");
                 string version = System.Diagnostics.FileVersionInfo.GetVersionInfo(defaultPath).FileVersion;
-                var navClient = NAVClientFactory.GetObject(version);
-                navClient.Path = defaultPath;
-                RunProcess(navClient);
+                RunForVersion(uri, defaultPath, fileVersion, false);
                 return;
             }
-            foreach (String navVersionFolder in GetNavVersionFolders()) {
-                if (RunForVersion(uri, navVersionFolder, fileVersion, false))
+            else
+            {
+                foreach (String navVersionFolder in GetNavVersionFolders())
                 {
-                    return;
+                    if (RunForVersion(uri, navVersionFolder, fileVersion, false))
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -94,8 +108,11 @@ namespace NVR_DynamicsNAVProtocolHandler
             {
                 try
                 {
-                    var folder = (String)Microsoft.Win32.Registry.GetValue(registryPath, "Path", "");
-                    folders.Add(folder);
+                    // We have to replace \r\n or the second "getValue" will fail, because of malformed registry-key
+                    var folder = (String)Microsoft.Win32.Registry.GetValue(registryPath.Replace(Environment.NewLine,""), "Path", "");
+                    // Add folder only if it exists
+                    if (Directory.Exists(folder))
+                        folders.Add(folder);
                 }
                 catch (Exception e)
                 {
@@ -117,10 +134,14 @@ namespace NVR_DynamicsNAVProtocolHandler
             var fileVersion = versionInfo.FileVersion;
             if (pid != 0)
             {
-                var newUri = NAV_URI_Extender.GetExtendedUri(new Uri(uri), pid);
-                if (newUri != null)
+                // Only trigger GetExtendedUri if uri does not contain service tier server and instance
+                if (uri.Contains("////"))
                 {
-                    uri = newUri.ToString();
+                    var newUri = NAV_URI_Extender.GetExtendedUri(new Uri(uri), pid);
+                    if (newUri != null)
+                    {
+                        uri = newUri.ToString();
+                    }
                 }
             }
 
@@ -152,9 +173,9 @@ namespace NVR_DynamicsNAVProtocolHandler
             var navPath = FindNavClient(fileVersion, activeProcessFolder);
             if (String.IsNullOrEmpty(navPath))
             {
-                if (!showMessageIfNotFound)
+                if (showMessageIfNotFound)
                 {
-                    MessageBox.Show("Error", "Version "+fileVersion+" of RTC was not found!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Version " + fileVersion + " of RTC was not found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 return false;
             }
@@ -310,6 +331,5 @@ namespace NVR_DynamicsNAVProtocolHandler
             }
             navClient.RunClient();
         }
-
     }
 }
