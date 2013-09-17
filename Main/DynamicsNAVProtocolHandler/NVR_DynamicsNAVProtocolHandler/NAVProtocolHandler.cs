@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Xml;
 using Win32Helper;
 
 namespace NVR_DynamicsNAVProtocolHandler
@@ -40,6 +42,7 @@ namespace NVR_DynamicsNAVProtocolHandler
                     }
                     else
                     {//Unknown client, check mapping
+                        RunFromUnknown(uri);
                         return;
                         //Use Default
                     }
@@ -65,16 +68,31 @@ namespace NVR_DynamicsNAVProtocolHandler
         private static void RunFromUnknown(string uri)
         {
             var fileVersion = NAV_URI_Extender.GetVersionFromMapping(uri);
-            if (fileVersion == null)
+
+            if (String.IsNullOrEmpty(fileVersion) && uri.ToLower().Contains("?buildversion="))
+            {
+                fileVersion = NAV_URI_Extender.GetVersionFromUri(uri);
+                // We need to remove the version string, NAV6 does not like it
+                // in NAV7 it is ignored
+                uri = uri.Replace("?buildversion=" + fileVersion, "");
+            }
+
+            if (String.IsNullOrEmpty(fileVersion))
             {
                 string defaultPath = (String)Microsoft.Win32.Registry.GetValue(@"HKEY_CLASSES_ROOT\DYNAMICSNAV\Shell\Open\Command", "Default", "");
-                RunProcess(defaultPath, @"""" + uri + @"""");
+                defaultPath = defaultPath.Replace("\"%1\"","");
+                string version = System.Diagnostics.FileVersionInfo.GetVersionInfo(defaultPath).FileVersion;
+                RunForVersion(uri, defaultPath, fileVersion, false);
                 return;
             }
-            foreach (String navVersionFolder in GetNavVersionFolders()) {
-                if (RunForVersion(uri, navVersionFolder, fileVersion, false))
+            else
+            {
+                foreach (String navVersionFolder in GetNavVersionFolders())
                 {
-                    return;
+                    if (RunForVersion(uri, navVersionFolder, fileVersion, false))
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -90,8 +108,11 @@ namespace NVR_DynamicsNAVProtocolHandler
             {
                 try
                 {
-                    var folder = (String)Microsoft.Win32.Registry.GetValue(registryPath, "Path", "");
-                    folders.Add(folder);
+                    // We have to replace \r\n or the second "getValue" will fail, because of malformed registry-key
+                    var folder = (String)Microsoft.Win32.Registry.GetValue(registryPath.Replace(Environment.NewLine,""), "Path", "");
+                    // Add folder only if it exists
+                    if (Directory.Exists(folder))
+                        folders.Add(folder);
                 }
                 catch (Exception e)
                 {
@@ -113,10 +134,14 @@ namespace NVR_DynamicsNAVProtocolHandler
             var fileVersion = versionInfo.FileVersion;
             if (pid != 0)
             {
-                var newUri = NAV_URI_Extender.GetExtendedUri(new Uri(uri), pid);
-                if (newUri != null)
+                // Only trigger GetExtendedUri if uri does not contain service tier server and instance
+                if (uri.Contains("////"))
                 {
-                    uri = newUri.ToString();
+                    var newUri = NAV_URI_Extender.GetExtendedUri(new Uri(uri), pid);
+                    if (newUri != null)
+                    {
+                        uri = newUri.ToString();
+                    }
                 }
             }
 
@@ -124,7 +149,10 @@ namespace NVR_DynamicsNAVProtocolHandler
             if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
             //Runs the client from same folder as calling process
             {
-                RunProcess(path + "Microsoft.Dynamics.Nav.Client.exe", @"""" + uri + @"""");
+                var navClient = NAVClientFactory.GetObject(fileVersion);
+                navClient.Path=path + "Microsoft.Dynamics.Nav.Client.exe";
+                navClient.Uri=uri;
+                RunProcess(navClient);
                 return;
             }
 
@@ -145,13 +173,16 @@ namespace NVR_DynamicsNAVProtocolHandler
             var navPath = FindNavClient(fileVersion, activeProcessFolder);
             if (String.IsNullOrEmpty(navPath))
             {
-                if (!showMessageIfNotFound)
+                if (showMessageIfNotFound)
                 {
-                    MessageBox.Show("Error", "Version "+fileVersion+" of RTC was not found!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Version " + fileVersion + " of RTC was not found!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 return false;
             }
-            RunProcess(navPath, @"""" + uri + @"""");
+            var navClient = NAVClientFactory.GetObject(fileVersion);
+            navClient.Uri = uri;
+            navClient.Path = navPath;
+            RunProcess(navClient);
             return true;
         }
 
@@ -286,30 +317,19 @@ namespace NVR_DynamicsNAVProtocolHandler
         /// </summary>
         /// <param name="path">The path.</param>
         /// <param name="param">The param.</param>
-        static private void RunProcess(string path, string param)
+        static private void RunProcess(NAVClient navClient)
         {
-            path = path.Replace(@" ""%1""", "");
-            if (path.IndexOf("-protocolhandler") > 0)
-            {
-            path = path.Replace(@" -protocolhandler", "");
-                param = @"-protocolhandler " + param;
-            }
-            var procInfo = new ProcessStartInfo(path, param);
-            procInfo.WorkingDirectory = Path.GetDirectoryName(path);
-            //procInfo.FileName = Path.GetFileName(path);
-
             if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.ShowMessageBox)
             {
-                if (MessageBox.Show("Starting this command:\n" + procInfo.FileName + @" " + param) == MessageBoxResult.OK) { }
+                if (MessageBox.Show("Starting this command:\n" + navClient.Path + @" " + navClient.Param) == MessageBoxResult.OK) { }
             }
 
-            var baloon = new Toaster(path);
+            var baloon = new Toaster(navClient.Path);
             if (NVR_DynamicsNAVProtocolHandler.Properties.Settings.Default.ShowFileInfo)
             {
                 baloon.Show();
             }
-            Process.Start(procInfo);
+            navClient.RunClient();
         }
-
     }
 }

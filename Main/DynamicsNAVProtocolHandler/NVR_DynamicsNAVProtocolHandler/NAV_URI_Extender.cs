@@ -10,9 +10,9 @@ namespace NVR_DynamicsNAVProtocolHandler
     /// </summary>
     class NAV_URI_Extender
     {
-        public static String GetVersionFromMapping(String URI)
+        public static String GetVersionFromMapping(String _uri)
         {
-            var target = NAVClient2URI.GetByURI(URI);
+            var target = NAVClient2URI.GetByURI(_uri);
             if (target != null)
             {
                 return target.Version;
@@ -21,6 +21,25 @@ namespace NVR_DynamicsNAVProtocolHandler
             {
                 return "";
             }
+        }
+
+        public static String GetVersionFromUri(String _uri)
+        {
+            string versionFromQuery = "";
+            Uri tempURI = new Uri(_uri);
+            if (tempURI.Query.ToLower().Contains("?buildversion="))
+            {
+                foreach (string queryPart in tempURI.Query.Split('?'))
+                {
+                    if (queryPart.StartsWith("buildversion="))
+                    {
+                        versionFromQuery = queryPart.Replace("buildversion=", "");
+                        break;
+                    }
+                }
+            }
+ 
+            return versionFromQuery;
         }
 
         public static Uri GetExtendedUri(Uri URI, uint pid)
@@ -51,8 +70,9 @@ namespace NVR_DynamicsNAVProtocolHandler
             //dynamicsnav://server:7056/dynamicsnav70/CRONUS International Ltd./runpage?page=99000759
             if (URI.Authority!="") 
                 return URI;
-            var rest = URI.ToString().Substring(16);
-            var result = URI.Scheme + "://" + target.NavServer +"/"+ target.Instance +"/" + target.Company + rest;
+
+            var rest = URI.Segments[3] + URI.Query;
+            var result = URI.Scheme + "://" + target.NavServer + "/" + target.Instance + "/" + target.Company + "/" + rest;
             return new Uri(result);
         }
     }
