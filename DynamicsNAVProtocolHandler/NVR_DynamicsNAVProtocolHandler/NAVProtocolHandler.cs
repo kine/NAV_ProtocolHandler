@@ -35,7 +35,7 @@ namespace NVR_DynamicsNAVProtocolHandler
                     String path = Path.GetDirectoryName(activeProcessFolder) + @"\";
                     //for attaching debugger
                     if ((Path.GetFileName(activeProcessFolder).ToLower() == "finsql.exe") ||
-                        (Path.GetFileName(activeProcessFolder).ToLower() == "Microsoft.Dynamics.Nav.Client.exe"))
+                        (Path.GetFileName(activeProcessFolder).ToLower() == "microsoft.dynamics.nav.client.exe"))
                     { //Known client, take the version from the client
                         RunFromClient(uri, pid, activeProcessFolder, path);
                         return;
