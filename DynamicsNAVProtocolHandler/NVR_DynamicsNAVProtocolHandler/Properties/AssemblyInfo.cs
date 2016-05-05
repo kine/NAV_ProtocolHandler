@@ -12,7 +12,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Kamil Sacek (Kine)")]
 [assembly: AssemblyProduct("DynamicsNAVProtocolHandler")]
-[assembly: AssemblyCopyright("Copyright © Kamil Sacek 2012")]
+[assembly: AssemblyCopyright("Copyright © Kamil Sacek 2012..2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
