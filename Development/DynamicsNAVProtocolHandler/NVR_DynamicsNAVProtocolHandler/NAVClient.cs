@@ -25,8 +25,11 @@ namespace NVR_DynamicsNAVProtocolHandler
                     //For version 6 and 7 do same process, use the 6 version class
                 case @"6":
                 case @"7": return new NAVClient6();
+                case @"8": return new NAVClient6();
+                case @"9": return new NAVClient6();
                 default:
-                    throw new ArgumentException("Version not known: "+version);
+                    return new NAVClient6();
+                    //throw new ArgumentException("Version not known: "+version);
             }
         }
     }
