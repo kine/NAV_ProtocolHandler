@@ -35,7 +35,8 @@ namespace NVR_DynamicsNAVProtocolHandler
                     String path = Path.GetDirectoryName(activeProcessFolder) + @"\";
                     //for attaching debugger
                     if ((Path.GetFileName(activeProcessFolder).ToLower() == "finsql.exe") ||
-                        (Path.GetFileName(activeProcessFolder).ToLower() == "microsoft.dynamics.nav.client.exe"))
+                        (Path.GetFileName(activeProcessFolder).ToLower() == "microsoft.dynamics.nav.client.exe") ||
+                        (Path.GetFileName(activeProcessFolder).ToLower() == "microsoft.dynamics.nav.client.x86.exe"))
                     { //Known client, take the version from the client
                         RunFromClient(uri, pid, activeProcessFolder, path);
                         return;
@@ -146,14 +147,27 @@ namespace NVR_DynamicsNAVProtocolHandler
             }
 
             NAVClient2URI.UpdateVersion(uri, fileVersion);
-            if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
+            if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.x86.exe"))
             //Runs the client from same folder as calling process
             {
                 var navClient = NAVClientFactory.GetObject(fileVersion);
-                navClient.Path=path + "Microsoft.Dynamics.Nav.Client.exe";
-                navClient.Uri=uri;
+                navClient.Path = path + "Microsoft.Dynamics.Nav.Client.x86.exe";
+                navClient.Uri = uri;
                 RunProcess(navClient);
                 return;
+            } else
+            {
+                if (File.Exists(path + "Microsoft.Dynamics.Nav.Client.exe"))
+                //Runs the client from same folder as calling process
+                {
+                    var navClient = NAVClientFactory.GetObject(fileVersion);
+                    navClient.Path = path + "Microsoft.Dynamics.Nav.Client.exe";
+                    navClient.Uri = uri;
+                    RunProcess(navClient);
+                    return;
+                }
+
+
             }
 
             RunForVersion(uri, activeProcessFolder, fileVersion);
